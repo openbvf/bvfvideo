@@ -1,0 +1,9 @@
+BvfVideo is a private app to record and play back video on macOS. Video and its audio are encrypted as they're captured and decrypted only inside the app where you play them back, so there's never a readable copy on disk for Spotlight, backups, other software, or people using your computer to find.
+
+iOS is record-only by design: the private key never leaves your Mac, so iPhone and iPad can record new video but can never play it back.
+
+On-device transcription (no cloud) of a recording's audio track; transcribed text can be saved encrypted to your Bedit journal if you have one. Browse by date and filter by tag. Export selection. Idle auto-lock.
+
+There is no account, no server, no backend. No analytics, no advertising identifier, no crash reporting. BvfVideo makes no network calls of its own.
+
+Open-source, no lock-in: every recording is a file named by date, decryptable from the command line with bvf-cli (Homebrew installable); decrypted contents are standard fragmented MP4 (H.264 + AAC). Full docs and source on GitHub.

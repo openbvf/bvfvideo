@@ -1,0 +1,241 @@
+import Foundation
+import AVFoundation
+import AppKit
+import BvfAppKitDecrypt
+import SwiftUI
+import UniformTypeIdentifiers
+
+@MainActor
+@Observable
+class VideoViewModel: BrowseViewModelBase {
+    var currentlyPlayingDate: Date?
+    var isPlaying = false
+    var currentTime: TimeInterval = 0
+    var duration: TimeInterval = 0
+    var wasTruncated = false
+    var isTranscribing = false
+
+    // NOT @ObservationIgnored: the player pane's placeholder branch reads no other observed
+    // property, so it must track `player` to re-render when playback starts.
+    private(set) var player: InMemoryVideoPlayer?
+    @ObservationIgnored private var loadTask: Task<Void, Never>?
+    @ObservationIgnored private var progressTimer: Timer?
+    @ObservationIgnored private var transcriptionTask: Task<Void, Never>?
+
+    override var itemTypeName: String { "video files" }
+
+    @ObservationIgnored let cloudManager: iCloudManager
+
+    init(fileAccessManager: FileAccessManager, appSettings: AppSettings, syncManager: SyncManager, cloudManager: iCloudManager) {
+        self.cloudManager = cloudManager
+        let range = DateRangePreset.last7Days.dateRange()
+        super.init(startDate: range.start, endDate: range.end, appSettings: appSettings, fileAccessManager: fileAccessManager, syncManager: syncManager)
+    }
+
+    override func clearSensitiveData(reason: String? = nil) {
+        loadTask?.cancel()
+        loadTask = nil
+        transcriptionTask?.cancel()
+        stop()
+        super.clearSensitiveData(reason: reason)
+    }
+
+    // MARK: - Playback
+
+    func play(date: Date) {
+        if currentlyPlayingDate == date {
+            togglePlayPause()
+            return
+        }
+
+        guard let session, let url = filesByDate[date] else { return }
+
+        loadTask?.cancel()
+        stop()
+
+        isLoading = true
+
+        loadTask = Task {
+            defer { isLoading = false }
+
+            do {
+                let result = try await session.decrypt(contentsOf: url)
+
+                guard !Task.isCancelled else { return }
+
+                let newPlayer = InMemoryVideoPlayer(data: result.data)
+                newPlayer.onPlaybackEnded = { [weak self] in
+                    guard let self else { return }
+                    self.stopProgressTimer()
+                    self.isPlaying = false
+                    self.currentTime = self.duration
+                }
+
+                let loadedDuration = await newPlayer.loadDuration()
+
+                guard !Task.isCancelled else { return }
+
+                player = newPlayer
+                duration = loadedDuration
+                wasTruncated = result.wasTruncated
+
+                newPlayer.play()
+                currentlyPlayingDate = date
+                isPlaying = true
+                startProgressTimer()
+
+                if result.wasTruncated {
+                    responseMessage = ResponseMessage("Playing truncated recording (incomplete)", type: .info)
+                }
+            } catch {
+                guard !Task.isCancelled else { return }
+                responseMessage = ResponseMessage("Playback failed: \(error.localizedDescription)", type: .error)
+            }
+        }
+    }
+
+    func togglePlayPause() {
+        guard let player else { return }
+
+        if isPlaying {
+            player.pause()
+            stopProgressTimer()
+            isPlaying = false
+        } else {
+            if currentTime >= duration, duration > 0 {
+                player.seek(to: 0)
+                currentTime = 0
+            }
+            player.play()
+            startProgressTimer()
+            isPlaying = true
+        }
+    }
+
+    func stop() {
+        loadTask?.cancel()
+        loadTask = nil
+        stopProgressTimer()
+
+        player?.stop()
+        player = nil
+        isPlaying = false
+        currentlyPlayingDate = nil
+        currentTime = 0
+        duration = 0
+        wasTruncated = false
+    }
+
+    func seek(to time: TimeInterval) {
+        player?.seek(to: time)
+        currentTime = time
+    }
+
+    private func startProgressTimer() {
+        progressTimer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
+            guard let self else { return }
+            MainActor.assumeIsolated {
+                guard let player = self.player else { return }
+                self.currentTime = player.currentTime
+                // Keep idle timer alive during hands-free playback.
+                self.idleTimer.userDidInteract()
+            }
+        }
+    }
+
+    private func stopProgressTimer() {
+        progressTimer?.invalidate()
+        progressTimer = nil
+    }
+
+    // MARK: - Transcription
+
+    func startTranscription(dates: [Date]) {
+        guard !isTranscribing, !dates.isEmpty else { return }
+        transcriptionTask = Task { [weak self] in
+            await self?.runTranscription(dates: dates)
+        }
+    }
+
+    func cancelTranscription() {
+        transcriptionTask?.cancel()
+    }
+
+    private func runTranscription(dates: [Date]) async {
+        isTranscribing = true
+        defer {
+            isTranscribing = false
+            transcriptionTask = nil
+        }
+
+        let total = dates.count
+        var succeeded = 0
+        var failed = 0
+
+        for (index, date) in dates.enumerated() {
+            if Task.isCancelled { break }
+            responseMessage = ResponseMessage("Transcribing \(index + 1) of \(total)...", type: .info)
+            do {
+                try await transcribeOne(date: date)
+                succeeded += 1
+            } catch {
+                failed += 1
+                responseMessage = ResponseMessage("Transcription failed: \(error.localizedDescription)", type: .error)
+            }
+        }
+
+        if Task.isCancelled {
+            responseMessage = ResponseMessage("Transcribed \(succeeded) of \(total), cancelled", type: .info)
+        } else if failed > 0 {
+            responseMessage = ResponseMessage("Transcribed \(succeeded) of \(total), \(failed) failed", type: .error)
+        } else {
+            responseMessage = ResponseMessage("Transcribed \(succeeded) recordings to Bedit", type: .success)
+        }
+    }
+
+    private func transcribeOne(date: Date) async throws {
+        guard let session,
+              let videoURL = filesByDate[date],
+              let beditFolderURL = cloudManager.siblingAppFolderURL(for: "Bedit"),
+              let publicKeyURL = fileAccessManager.publicKeyURL else {
+            throw NSError(
+                domain: "io.bvf.bvideo.transcription",
+                code: 1,
+                userInfo: [NSLocalizedDescriptionKey: "Missing configuration"]
+            )
+        }
+
+        guard #available(macOS 26.0, *) else {
+            throw NSError(
+                domain: "io.bvf.bvideo.transcription",
+                code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "Transcription requires macOS 26 or newer"]
+            )
+        }
+
+        let videoData = try await session.decrypt(contentsOf: videoURL).data
+
+        let transcriptionService = VideoTranscriptionService()
+        let transcribedText = try await transcriptionService.transcribe(videoData: videoData)
+
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        formatter.timeZone = TimeZone(identifier: "UTC")
+        let dateString = formatter.string(from: date)
+        let formattedText = "[Transcribed from BvfVideo recording \(dateString)]\n\n\(transcribedText)"
+
+        let textData = formattedText.data(using: .utf8) ?? Data()
+        let transcriptionStaging = URL(fileURLWithPath: NSTemporaryDirectory(), isDirectory: true)
+            .appendingPathComponent("bvfvideo-transcription-staging")
+        _ = try await BvfStore.write(
+            data: textData,
+            to: beditFolderURL,
+            publicKeyURL: publicKeyURL,
+            date: date,
+            suffix: "txt",
+            stagingURL: transcriptionStaging
+        )
+
+        addTag("transcribed", to: [date])
+    }
+}

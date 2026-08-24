@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <rect x="100" y="100" width="824" height="824" rx="185" ry="185" fill="#F4ECD8"/>
+  <g fill="none" stroke="#2A1F14" stroke-width="46"
+     stroke-linecap="round" stroke-linejoin="round">
+    <!-- slate body -->
+    <rect x="210" y="478" width="604" height="322" rx="40"/>
+    <!-- hinged clapper stick -->
+    <g transform="rotate(-11 233 478)">
+      <rect x="210" y="360" width="604" height="118" rx="28"/>
+    </g>
+  </g>
+</svg>
