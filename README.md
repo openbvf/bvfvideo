@@ -6,7 +6,7 @@ BvfVideo is a private app to record and play back video on macOS. You can also r
 
 iOS is record-only by design. An iPhone or iPad can record new video but can never play it back, because the private key isn't on iOS at all. If your phone is taken, nothing on it is playable.
 
-Screenshots are on the App Store listing.
+Screenshots are on the [App Store listing](https://apps.apple.com/us/app/bvfvideo/id6758463636).
 
 ## Features
 
@@ -21,6 +21,8 @@ Screenshots are on the App Store listing.
 - Idle auto-lock.
 
 ## Install
+
+<a href="https://apps.apple.com/us/app/bvfvideo/id6758463636?itsct=apps_box_badge&amp;itscg=30200"><img alt="Download on the App Store" src="https://tools.applemediaservices.com/api/badges/download-on-the-app-store/black/en-us" height="50"></a>
 
 - **macOS**: Requires macOS 15 or later; on-device transcription requires macOS 26. Or [build from source](BUILDING.md).
 - **iOS**: Requires iOS 18 or later.

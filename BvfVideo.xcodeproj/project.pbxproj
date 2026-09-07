@@ -221,15 +221,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "BvfVideo-iOS/BvfVideo-iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 6Q2J3ZDLNY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = BvfVideo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Encrypt video direct to iCloud file";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Encrypt video direct to iCloud file";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Record video that BvfVideo saves as an encrypted file.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Record the sound for your video, which BvfVideo saves as an encrypted file.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -261,15 +261,15 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "BvfVideo-iOS/BvfVideo-iOS.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 6Q2J3ZDLNY;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = BvfVideo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Encrypt video direct to iCloud file";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Encrypt video direct to iCloud file";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Record video that BvfVideo saves as an encrypted file.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Record the sound for your video, which BvfVideo saves as an encrypted file.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -424,7 +424,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 6Q2J3ZDLNY;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -445,9 +445,9 @@
 				"INFOPLIST_KEY_CFBundleDisplayName[sdk=macosx*]" = BvfVideoDB;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Encrypt video direct to iCloud file";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Record video that BvfVideo saves as an encrypted file.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Encrypt video direct to iCloud file";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Record the sound for your video, which BvfVideo saves as an encrypted file.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -474,7 +474,7 @@
 				CODE_SIGN_ENTITLEMENTS = BvfVideo/BvfVideo.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = 6Q2J3ZDLNY;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -495,9 +495,9 @@
 				"INFOPLIST_KEY_CFBundleDisplayName[sdk=macosx*]" = BvfVideo;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Encrypt video direct to iCloud file";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Record video that BvfVideo saves as an encrypted file.";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Encrypt video direct to iCloud file";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Record the sound for your video, which BvfVideo saves as an encrypted file.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
